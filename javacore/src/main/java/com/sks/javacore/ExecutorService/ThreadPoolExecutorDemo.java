@@ -19,12 +19,13 @@ public class ThreadPoolExecutorDemo {
 
     public ThreadPoolExecutorDemo() {
         int corePoolSize = 5;
-        int maxPoolSize = workCount;
+        int maxPoolSize = 5;
         long keepAliveTime = 5000;
         INDEX_EXECUTOR = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<Runnable>(maxPoolSize),
                 new ThreadFactoryBuilder().setNameFormat("IndexExecutor-%d").setDaemon(true).build());
         INDEX_EXECUTOR.prestartAllCoreThreads();
+        INDEX_EXECUTOR.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         workProducer = new Thread(new WorkProducer());
     }
 
@@ -40,7 +41,7 @@ public class ThreadPoolExecutorDemo {
     class WorkProducer implements Runnable {
         public void run() {
             while (true) {
-                System.out.println("Going to produce %d works" + workCount);
+                System.out.println("-----Going to produce " + workCount + " works-----");
                 for (int i = 0; i < workCount; i++) {
                     try {
                         INDEX_EXECUTOR.submit(new Tasks(i));
@@ -51,6 +52,7 @@ public class ThreadPoolExecutorDemo {
                         System.out.println("WorkProducer - RejectedExecutionException" + e);
                     }
                 }
+                System.out.println("-----Produced " + workCount + " works-----");
                 try {
                     System.out.println("Going to sleep for 5 seconds");
                     Thread.sleep(5000);
@@ -69,6 +71,11 @@ public class ThreadPoolExecutorDemo {
         }
         public void run() {
             System.out.println("Started running task " + _taskId);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                System.out.println("Tasks - InterruptedException");
+            }
             System.out.println("Completed running task " + _taskId);
         }
     }
