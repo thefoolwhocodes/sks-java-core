@@ -6,6 +6,7 @@ package com.sks.javacore.collections.hashmap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public class HashMapDemonstrator {
@@ -33,6 +34,9 @@ public class HashMapDemonstrator {
         System.out.println("Finished - replaceAll");
     }
 
+    /**
+     * Demonstration of BiFunction usage during replaceAll.
+     */
     private static void replaceAllByFilter() {
         System.out.println("Started - replaceAllByFilter");
 
@@ -41,7 +45,7 @@ public class HashMapDemonstrator {
         list.add(5);
 
         {
-            System.out.println("Started - replaceAllByFilter - example 1");
+            System.out.println("Started - replaceAllByFilter - example 1 - explicit BiFunction");
             HashMap<Integer, Integer> objHM = new HashMap<Integer, Integer>();
             objHM.put(1, 10);
             objHM.put(2, 20);
@@ -61,7 +65,7 @@ public class HashMapDemonstrator {
         }
 
         {
-            System.out.println("Started - replaceAllByFilter - example 2");
+            System.out.println("Started - replaceAllByFilter - example 2 - implicit BiFunction");
             HashMap<Integer, Integer> objHM = new HashMap<Integer, Integer>();
             objHM.put(1, 10);
             objHM.put(2, 20);
@@ -82,9 +86,64 @@ public class HashMapDemonstrator {
         System.out.println("Finished - replaceAllByFilter");
     }
 
+    private static void addUpdateAllByFilter() {
+        System.out.println("Started - addUpdateAllByFilter");
+
+        Collection<Integer> list = new ArrayList<Integer>();
+        list.add(3);
+        list.add(5);
+        list.add(9);
+
+        HashMap<Integer, Integer> objHM = new HashMap<Integer, Integer>();
+        objHM.put(1, 10);
+        objHM.put(2, 20);
+        objHM.put(3, 30);
+        objHM.put(4, 40);
+        objHM.put(5, 50);
+
+        objHM.replaceAll((k, v) -> {
+            if (list.contains(k))
+                return v + 1;
+            else {
+                return v;
+            }
+        });
+
+        list.forEach(e -> {
+            if (!objHM.containsKey(e))
+                objHM.put(e, 1);
+        });
+
+        System.out.println(objHM);
+
+        System.out.println("Finished - addUpdateAllByFilter");
+    }
+
+    private static void lambdaErrorExplanation() {
+        List<String> list = new ArrayList<String>();
+        list.add("name");
+        list.add("age");
+        list.add("address");
+
+        boolean flag = true;
+        flag = false;
+
+        {
+            flag = true;
+        }
+
+        /*
+         * list.stream().forEach(e -> { //error Local variable flag defined in an
+         * enclosing scope must be final or effectively final if (flag) {
+         * System.out.println(e); } });
+         */
+    }
+
     public static void main(String[] args) {
         put();
         replaceAll();
         replaceAllByFilter();
+        addUpdateAllByFilter();
+        lambdaErrorExplanation();
     }
 }
